@@ -6,6 +6,7 @@
 #include "word.h"
 #include "helper.h"
 #include "multitree.h"
+#include "heap.h"
 
 void ignoreInput(System system) {
     FILE *fi = system->fi;
@@ -21,7 +22,7 @@ void add(System system) {
     // get rid of the first whitespace
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    fgetc(fi);
+    // fgetc(fi);
 
     File file = malloc(sizeof(struct file));
     file->name = readWord(system);
@@ -57,7 +58,7 @@ void delete(System system) {
     // get rid of the first whitespace
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    fgetc(fi);
+    // fgetc(fi);
 
     char *name = readWord(system);
     // todo find file, delete its keywords
@@ -69,7 +70,7 @@ void delete(System system) {
         free(temp);
     }
 
-    while (files->next && strcmp(((File)files->info)->name, name) != 0)
+    while (files->next && strcmp(((File)files->next->info)->name, name) != 0)
         files = files->next;
 
     if (!files->next) {
@@ -82,7 +83,8 @@ void delete(System system) {
     List it = ((File)files->next->info)->keywords;
 
     while (it) {
-        removeRecursive(system->root, (char *)it->info, 0, strlen((char *)it->info));
+        // removeRecursive(system->root, (char *)it->info, 0, strlen((char *)it->info));
+        deleteReferences(system->root, it->info, name);
         List node = it;
         it = it->next;
         free(node);
@@ -91,6 +93,7 @@ void delete(System system) {
     List temp = files->next;
     files->next = files->next->next;
     free(temp);
+    fprintf(fo, "OK\n");
 }
 
 // 2.3
@@ -100,23 +103,24 @@ void addKW(System system) {
     // get rid of the first whitespace
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    fgetc(fi);
+    // fgetc(fi);
 
     char *name = readWord(system);
     List current = system->files;
 
-    char *keyword = readWord(system);
-    while (current && strcmp((char *)current->info, keyword) != 0)
+    
+    while (current && strcmp(((File)current->info)->name, name) != 0)
         current = current->next;
 
     if (!current) {
         fprintf(fo, "NOT FOUND\n");
         free(name);
-        free(keyword);
+        ignoreInput(system);
         return;
     }
 
     // found:
+    char *keyword = readWord(system);
     List temp = ((File)current->info)->keywords;
     while (temp) {
         if (strcmp(temp->info, keyword) == 0) {
@@ -133,8 +137,181 @@ void addKW(System system) {
     addMultitree(system->root, keyword, current->info);
 
     free(name);
+    fprintf(fo, "OK\n");
 }
 
-//
+// 2.4
 //
 
+void delKW(System system) {
+    FILE *fi = system->fi;
+    FILE *fo = system->fo;
+    // fgetc(fi);
+
+    char *name = readWord(system);
+    List current = system->files;
+
+    while (current && strcmp(((File)current->info)->name, name) != 0)
+        current = current->next;
+
+    if (!current) {
+        fprintf(fo, "NOT FOUND\n");
+        free(name);
+        return;
+    }
+
+    // found file, search for keyword:
+    char *keyword = readWord(system);
+    List keywords = ((File)current->info)->keywords;
+    // edge case - is head
+    if (strcmp(keywords->info, keyword) == 0) {
+        List temp = keywords;
+        ((File)current->info)->keywords = keywords->next;
+        deleteReferences(system->root, keyword, name);
+        if (!((File)current->info)->keywords)
+            removeFile(system->files, name);
+        free(temp->info);
+        free(temp);
+        fprintf(fo, "OK\n");
+        return;
+    }
+
+    while (keywords->next && strcmp(keywords->next->info, keyword) != 0)
+        keywords = keywords->next;
+    
+    if (!keywords->next)  {
+        // the keyword doesn't exist
+        free(name);
+        free(keyword);
+        fprintf(fo, "OK\n");
+        return;
+    }
+
+    // we found the keyword, remove it
+    List temp = keywords->next;
+    keywords->next = keywords->next->next;
+    deleteReferences(system->root, keyword, name);
+    free(temp->info);
+    free(temp);
+
+    free(name);
+    free(keyword);
+    fprintf(fo, "OK\n");
+}
+
+// 2.5
+//
+
+void find(System system) {
+    FILE *fi = system->fi;
+    FILE *fo = system->fo;
+    // fgetc(fi);
+    Tree root = system->root;
+
+    char *keyword = readWord(system);
+    int i = 0;
+    int l = strlen(keyword);
+
+    Tree current = root;
+    while (i < l) {
+        if (current->children[keyword[i] - '0'])
+            current = current->children[keyword[i] - '0'];
+        else {
+            fprintf(fo, "EMPTY\n");
+            free(keyword);
+            return;
+        }
+        i++;
+    }
+
+    int listLength = length(current->first);
+    if (!listLength) {
+        fprintf(fo, "EMPTY\n");
+        free(keyword);
+        return;
+    }
+
+    fprintf(fo, "%d ", listLength);
+    List files = current->first;
+    while (files) {
+        fprintf(fo, "%s ", ((File)files->info)->name);
+        files = files->next;
+    }
+    fprintf(fo, "\n");
+    free(keyword);
+}
+
+// 2.6
+//
+
+void topK(System system) {
+    FILE *fi = system->fi;
+    FILE *fo = system->fo;
+    // fgetc(fi);
+    Tree root = system->root;
+
+    int k;
+    char *keyword = readWord(system);
+    fscanf(fo, "%d", &k);
+    // get rid of '\n'
+    fgetc(fo);
+    int i = 0;
+    int l = strlen(keyword);
+
+    Tree current = root;
+    while (i < l) {
+        if (current->children[keyword[i] - '0'])
+            current = current->children[keyword[i] - '0'];
+        else {
+            fprintf(fo, "EMPTY\n");
+            free(keyword);
+            return;
+        }
+        i++;
+    }
+
+    int listLength = length(current->first);
+    if (!listLength) {
+        fprintf(fo, "EMPTY\n");
+        free(keyword);
+        return;
+    }
+
+    List it = current->first;
+    Heap h = initHeap();
+    while (it) {
+        insertHeap(h, it->info);
+        it = it->next;
+    }
+
+    while (!isEmptyHeap(h) && k--) {
+        File max = extractMax(h);
+        fprintf(fo, "%s ", max->name);
+    }
+    
+    freeHeap(h);
+    free(keyword);
+}
+
+// 2.7
+// 
+
+void print(System system) {
+    FILE *fi = system->fi;
+    FILE *fo = system->fo;
+    Tree root = system->root;
+
+    int ok = 0;
+    for (int i = 0; i < 26; i++)
+        if (root->children[i]) {
+            ok = 1;
+
+        }
+
+    if (!ok) {
+        fprintf(fo, "EMPTY\n");
+        return;
+    }
+
+
+}

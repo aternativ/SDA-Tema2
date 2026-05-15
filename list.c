@@ -4,9 +4,18 @@
 #include "helper.h"
 #include "list.h"
 
-List createNode (void *info) {
+List createNode(void *info) {
     List node = malloc(sizeof(ListNode));
     return node;
+}
+
+int length(List head) {
+    int l = 0;
+    while (head) {
+        l++;
+        head = head->next;
+    }
+    return l;
 }
 
 List insertFront(List head, void *info) {
@@ -38,10 +47,17 @@ List insertSorted(List head, void *info) {
     return head;
 }
 
+void freeFile(File file) {
+    free(file->keywords);
+    free(file->name);
+    free(file);
+}
+
 List removeFile(List head, char *name) {
     List it = head;
     if (strcmp(((File)head->info)->name, name) == 0) {
         head = head->next;
+        freeFile(it->info);
         free(it);
         return head;
     }
@@ -51,6 +67,7 @@ List removeFile(List head, char *name) {
 
     List temp = it->next;
     it->next = it->next->next;
+    freeFile(temp->info);
     free(temp);
     
     return head;

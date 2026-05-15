@@ -7,7 +7,8 @@ typedef struct file *File;
 typedef struct tree {
     char *keyword;
     ListNode *first;
-    struct tree *children[27];
+    // 26 + (chars between 'Z' and 'a' in ASCII) + 26
+    struct tree *children[58];
 } *Tree;
 
 Tree addMultitree(Tree root, char *s, File file);

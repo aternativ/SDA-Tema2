@@ -19,9 +19,9 @@ Tree addMultitree(Tree root, char *s, File file) {
 
     Tree current = root;
     while (i < l) {
-        if (!current->children[s[i] - '0'])
-            current->children[s[i] - '0'] = createTree();
-        current = current->children[s[i] - '0'];
+        if (!current->children[s[i] - 'A'])
+            current->children[s[i] - 'A'] = createTree();
+        current = current->children[s[i] - 'A'];
         i++;
     }
 
@@ -31,13 +31,13 @@ Tree addMultitree(Tree root, char *s, File file) {
 }
 
 Tree removeRecursive(Tree root, char *s, int index, int l) {
-    if (root->children[s[index] - '0'] && index < l - 1)
-            root->children[s[index] - '0'] = removeRecursive(root->children[s[index] - '0'], s, index + 1, l);
+    if (root->children[s[index] - 'A'] && index < l - 1)
+            root->children[s[index] - 'A'] = removeRecursive(root->children[s[index] - '0'], s, index + 1, l);
 
     int ok = 0;
     if (root->first)
         ok = 1;
-    for (int i = 0; i < 26; i++)
+    for (int i = 0; i < 58; i++)
             if (root->children[i])
                 ok = 1;
     if (!ok)
@@ -52,7 +52,7 @@ void deleteReferences(Tree root, char *keyword, char *name) {
 
     Tree current = root;
     while (i < l) {
-        current = current->children[keyword[i] - '0'];
+        current = current->children[keyword[i] - 'A'];
         i++;
     }
 
@@ -75,7 +75,7 @@ void printRecursive(FILE *fo, Tree root) {
         fprintf(fo, "\n");
     }
 
-    for (int i = 0; i < 26; i++)
+    for (int i = 0; i < 58; i++)
         if (root->children[i])
             printRecursive(fo, root->children[i]);
 }

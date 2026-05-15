@@ -31,9 +31,11 @@ char *readWord(System system) {
     char *s = word->s;
     int c;
     // this also consumes the endline! don't fgetc in main
-    while ((c = fgetc(fi) != '\n') && c != ' ' && c != EOF) {
-        if (word->size + 1 >= word->max_size)
+    while (((c = fgetc(fi)) != '\n') && c != ' ' && c != EOF) {
+        if (word->size + 1 >= word->max_size) {
             resizeWord(word);
+            s = word->s;
+        }
         s[word->size++] = c;
     }
     if (word->size + 1 >= word->max_size)

@@ -6,6 +6,7 @@
 
 List createNode(void *info) {
     List node = malloc(sizeof(ListNode));
+    node->info = info;
     return node;
 }
 
@@ -28,14 +29,14 @@ List insertSorted(List head, void *info) {
     // check for edge case
     if (!head)
         return insertFront(head, info);
-    char *s = head->info;
-    char *p = info;
+    char *s = ((File)head->info)->name;
+    char *p = ((File)info)->name;
     if (strcmp(s, p) > 0)
         return insertFront(head, info);
 
     List current = head;
     while (current->next) {
-        s = current->next->info;
+        s = ((File)current->next->info)->name;
         if (strcmp(s, p) > 0)
             break;
         current = current->next;

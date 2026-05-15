@@ -41,10 +41,10 @@ void add(System system) {
     }
 
     Tree root = system->root;
-    for (int i = 1; i < n_keywords; i++) {
+    for (int i = 1; i <= n_keywords; i++) {
         char *keyword = readWord(system);
         insertFront(file->keywords, keyword);
-        addMultitree(root, keyword, file);
+        system->root = addMultitree(root, keyword, file);
     }
     insertFront(system->files, file);
 
@@ -252,9 +252,9 @@ void topK(System system) {
 
     int k;
     char *keyword = readWord(system);
-    fscanf(fo, "%d", &k);
+    fscanf(fi, "%d", &k);
     // get rid of '\n'
-    fgetc(fo);
+    fgetc(fi);
     int i = 0;
     int l = strlen(keyword);
 
@@ -302,10 +302,9 @@ void print(System system) {
     Tree root = system->root;
 
     int ok = 0;
-    for (int i = 0; i < 26; i++)
+    for (int i = 0; i < 58; i++)
         if (root->children[i]) {
             ok = 1;
-
         }
 
     if (!ok) {

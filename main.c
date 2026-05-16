@@ -3,25 +3,14 @@
 #include <string.h>
 #include "list.h"
 #include "helper.h"
+#include "multitree.h"
 #include "word.h"
 #include "functions.h"
 #include "system.h"
 
-void printFiles(System system) {
-    FILE *fo = system->fo;
-    List files = system->files;
-    while (files) {
-        File f;
-        f = files->info;
-        printf("%s ", f->name);
-        files = files->next;
-    }
-    printf("\n");
-}
-
 int main() 
 {
-    System system = malloc(sizeof(struct system));
+    System system = calloc(1, sizeof(struct system));
     FILE *fi, *fo;
     system->fi = fi = fopen("indexare.in", "r");
     system->fo = fo = fopen("indexare.out", "w");
@@ -38,7 +27,6 @@ int main()
     char *command;
     while (q--) {
         command = readWord(system);
-        printf("Command: %s\n", command);
         if (strcmp(command, "ADD") == 0)
             add(system);
         else if (strcmp(command, "DEL") == 0)
@@ -58,12 +46,27 @@ int main()
         else
             fprintf(fo, "UNRECOGNIZED\n");
 
-        printFiles(system);
-
         free(command);
     }
     
     fclose(fi);
     fclose(fo);
+    freeTree(system->root);
+    List files = system->files;
+    while (files) {
+        List temp = files;
+        free(((File)files->info)->name);
+        List keywords = ((File)files->info)->keywords;
+        while (keywords) {
+            free(keywords->info);
+            List tempKeyword = keywords;
+            keywords = keywords->next;
+            free(tempKeyword);
+        }
+        free(files->info);
+        files = files->next;
+        free(temp);
+    }
+    free(system);
     return 0;
 }

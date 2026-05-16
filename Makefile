@@ -18,7 +18,7 @@ word.o: word.c word.h system.h
 heap.o: heap.c heap.h helper.h
 	gcc -g -c heap.c -o heap.o
 
-multitree.o: multitree.c list.h helper.h multitree.h
+multitree.o: multitree.c list.h helper.h multitree.h word.h
 	gcc -g -c multitree.c -o multitree.o
 
 clean:

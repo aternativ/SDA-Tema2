@@ -18,5 +18,6 @@ Tree removeRecursive(Tree root, char *s, int index, int l);
 void deleteReferences(Tree root, char *keyword, char *name);
 void printRecursive(FILE *fo, Tree root);
 void listRecursive(Tree root, List *prefixFiles);
+void freeTree(Tree root);
 
 #endif

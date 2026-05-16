@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "word.h"
 #include "list.h"
 #include "helper.h"
 #include "multitree.h"
@@ -25,7 +26,8 @@ Tree addMultitree(Tree root, char *s, File file) {
         i++;
     }
 
-    current->keyword = s;
+    if (!current->keyword)
+        current->keyword = duplicate(s);
     if (!existsFile(current->first, file->name))
         current->first = insertSorted(current->first, file);
     return root;
@@ -41,8 +43,11 @@ Tree removeRecursive(Tree root, char *s, int index, int l) {
     for (int i = 0; i < 58; i++)
             if (root->children[i])
                 ok = 1;
-    if (!ok)
-            root = NULL;
+    if (!ok) {
+        free(root->keyword);
+        free(root);
+        root = NULL;
+    }
     
     return root;
 }
@@ -58,6 +63,7 @@ void deleteReferences(Tree root, char *keyword, char *name) {
     }
 
     current->first = removeFile(current->first, name);
+
     if (!current->first)
         removeRecursive(root, keyword, 0, strlen(keyword));
 }
@@ -94,4 +100,13 @@ void listRecursive(Tree root, List *prefixFiles) {
     for (int i = 0; i < 58; i++)
         if (root->children[i])
             listRecursive(root->children[i], prefixFiles);
+}
+
+void freeTree(Tree root) {
+    for (int i = 0; i < 58; i++)
+        if(root->children[i])
+            freeTree(root->children[i]);
+    freeList(root->first);
+    free(root->keyword);
+    free(root);
 }

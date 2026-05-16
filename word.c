@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "word.h"
 #include "system.h"
 
@@ -43,4 +44,13 @@ char *readWord(System system) {
     s[word->size++] = '\0';
     free(word);
     return s;
+}
+
+char *duplicate(char *s) {
+    int l = strlen(s);
+    char *dup = malloc((l + 1) * sizeof(char));
+    for (int i = 0; i < l; i++)
+        dup[i] = s[i];
+    dup[l] = '\0';
+    return dup;
 }

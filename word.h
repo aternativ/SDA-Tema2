@@ -10,5 +10,6 @@ typedef struct word {
 } *Word;
 
 char *readWord(System system);
+char *duplicate(char *s);
 
 #endif

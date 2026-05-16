@@ -11,7 +11,7 @@
 void ignoreInput(System system) {
     FILE *fi = system->fi;
     int c;
-    while ((c = fgetc(fi) != '\n' && c != EOF));
+    while ((c = fgetc(fi) != '\n') && c != EOF);
 }
 
 // 2.1
@@ -22,9 +22,8 @@ void add(System system) {
     // get rid of the first whitespace
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    // fgetc(fi);
 
-    File file = malloc(sizeof(struct file));
+    File file = calloc(1, sizeof(struct file));
     file->name = readWord(system);
     fscanf(fi, "%d", &file->score);
     // fscanf leaves the whitespace in the buffer
@@ -57,7 +56,6 @@ void delete(System system) {
     // get rid of the first whitespace
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    // fgetc(fi);
 
     char *name = readWord(system);
     if (!system->files) {
@@ -65,8 +63,9 @@ void delete(System system) {
         free(name);
         return;
     }
-    // todo find file, delete its keywords
+    // find file, delete its keywords
     List files = system->files;
+
     // edge case - is head
     if (strcmp(((File)files->info)->name, name) == 0) {
         List temp = files;
@@ -74,17 +73,17 @@ void delete(System system) {
 
         File found = ((File)files->info);
         while (found->keywords) {
-            // removeRecursive(system->root, (char *)it->info, 0, strlen((char *)it->info));
             deleteReferences(system->root, found->keywords->info, name);
             List node = found->keywords;
             found->keywords = found->keywords->next;
+            free(node->info);
             free(node);
         }
 
-        // what to do with freeFile??
         freeFile(temp->info);
         free(temp);
         fprintf(fo, "OK\n");
+        free(name);
         return;
     }
 
@@ -101,10 +100,10 @@ void delete(System system) {
     File found = ((File)files->next->info);
 
     while (found->keywords) {
-        // removeRecursive(system->root, (char *)it->info, 0, strlen((char *)it->info));
         deleteReferences(system->root, found->keywords->info, name);
         List node = found->keywords;
         found->keywords = found->keywords->next;
+        free(node->info);
         free(node);
     }
 
@@ -122,7 +121,6 @@ void addKW(System system) {
     // get rid of the first whitespace
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    // fgetc(fi);
 
     char *name = readWord(system);
     List current = system->files;
@@ -165,7 +163,6 @@ void addKW(System system) {
 void delKW(System system) {
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    // fgetc(fi);
 
     char *name = readWord(system);
     List current = system->files;
@@ -225,7 +222,6 @@ void delKW(System system) {
 void find(System system) {
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    // fgetc(fi);
     Tree root = system->root;
 
     char *keyword = readWord(system);
@@ -267,7 +263,6 @@ void find(System system) {
 void topK(System system) {
     FILE *fi = system->fi;
     FILE *fo = system->fo;
-    // fgetc(fi);
     Tree root = system->root;
 
     int k;

@@ -10,7 +10,7 @@ int compare(void *a, void *b) {
     File fb = b;
 
     if (fa->score != fb->score)
-        return fa->score > fb->score;
+        return fa->score - fb->score;
     
     // if strcmp is > 0, that means we prefer "a", so we return > 0.
     // function is for a max heap. > 0 is preffered for the top.
@@ -49,7 +49,7 @@ void siftDown(Heap h, int index) {
 }
 
 void siftUp(Heap h, int index) {
-    while (index >= 0 && compare(h->files[(index - 1) / 2], h->files[index]) < 0) {
+    while (index > 0 && compare(h->files[(index - 1) / 2], h->files[index]) < 0) {
         File aux = h->files[index];
         h->files[index] = h->files[(index - 1) / 2];
         h->files[(index - 1) / 2] = aux; 

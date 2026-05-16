@@ -32,7 +32,7 @@ Tree addMultitree(Tree root, char *s, File file) {
 
 Tree removeRecursive(Tree root, char *s, int index, int l) {
     if (root->children[s[index] - 'A'] && index < l - 1)
-            root->children[s[index] - 'A'] = removeRecursive(root->children[s[index] - '0'], s, index + 1, l);
+            root->children[s[index] - 'A'] = removeRecursive(root->children[s[index] - 'A'], s, index + 1, l);
 
     int ok = 0;
     if (root->first)
@@ -58,7 +58,7 @@ void deleteReferences(Tree root, char *keyword, char *name) {
 
     current->first = removeFile(current->first, name);
     if (!current->first)
-        root = removeRecursive(root, keyword, 0, strlen(keyword));
+        removeRecursive(root, keyword, 0, strlen(keyword));
 }
 
 void printRecursive(FILE *fo, Tree root) {

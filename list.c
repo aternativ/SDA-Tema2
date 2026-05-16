@@ -58,7 +58,6 @@ List removeFile(List head, char *name) {
     List it = head;
     if (strcmp(((File)head->info)->name, name) == 0) {
         head = head->next;
-        freeFile(it->info);
         free(it);
         return head;
     }
@@ -68,7 +67,6 @@ List removeFile(List head, char *name) {
 
     List temp = it->next;
     it->next = it->next->next;
-    freeFile(temp->info);
     free(temp);
     
     return head;

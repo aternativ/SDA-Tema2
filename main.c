@@ -1,9 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "list.h"
+#include "helper.h"
 #include "word.h"
 #include "functions.h"
 #include "system.h"
+
+void printFiles(System system) {
+    FILE *fo = system->fo;
+    List files = system->files;
+    while (files) {
+        File f;
+        f = files->info;
+        printf("%s ", f->name);
+        files = files->next;
+    }
+    printf("\n");
+}
 
 int main() 
 {
@@ -41,6 +55,8 @@ int main()
             print(system);
         else
             fprintf(fo, "UNRECOGNIZED\n");
+
+        printFiles(system);
 
         free(command);
     }

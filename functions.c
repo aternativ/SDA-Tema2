@@ -40,13 +40,12 @@ void add(System system) {
         return;
     }
 
-    Tree root = system->root;
     for (int i = 1; i <= n_keywords; i++) {
         char *keyword = readWord(system);
-        insertFront(file->keywords, keyword);
-        system->root = addMultitree(root, keyword, file);
+        file->keywords = insertFront(file->keywords, keyword);
+        system->root = addMultitree(system->root, keyword, file);
     }
-    insertFront(system->files, file);
+    system->files = insertFront(system->files, file);
 
     fprintf(fo, "OK\n");
 }
@@ -67,7 +66,21 @@ void delete(System system) {
     if (strcmp(((File)files->info)->name, name) == 0) {
         List temp = files;
         system->files = files->next;
+
+        File found = ((File)files->info);
+        while (found->keywords) {
+            // removeRecursive(system->root, (char *)it->info, 0, strlen((char *)it->info));
+            deleteReferences(system->root, found->keywords->info, name);
+            List node = found->keywords;
+            found->keywords = found->keywords->next;
+            free(node);
+        }
+
+        // what to do with freeFile??
+        freeFile(temp->info);
         free(temp);
+        fprintf(fo, "OK\n");
+        return;
     }
 
     while (files->next && strcmp(((File)files->next->info)->name, name) != 0)
@@ -80,18 +93,19 @@ void delete(System system) {
     }
 
     // delete keywords from next and then delete next
-    List it = ((File)files->next->info)->keywords;
+    File found = ((File)files->next->info);
 
-    while (it) {
+    while (found->keywords) {
         // removeRecursive(system->root, (char *)it->info, 0, strlen((char *)it->info));
-        deleteReferences(system->root, it->info, name);
-        List node = it;
-        it = it->next;
+        deleteReferences(system->root, found->keywords->info, name);
+        List node = found->keywords;
+        found->keywords = found->keywords->next;
         free(node);
     }
 
     List temp = files->next;
     files->next = files->next->next;
+    freeFile(temp->info);
     free(temp);
     fprintf(fo, "OK\n");
 }
@@ -133,7 +147,7 @@ void addKW(System system) {
     }
 
     // not in keywords, add
-    insertFront(((File)current->info)->keywords, keyword);
+    ((File)current->info)->keywords = insertFront(((File)current->info)->keywords, keyword);
     addMultitree(system->root, keyword, current->info);
 
     free(name);
@@ -214,8 +228,8 @@ void find(System system) {
 
     Tree current = root;
     while (i < l) {
-        if (current->children[keyword[i] - '0'])
-            current = current->children[keyword[i] - '0'];
+        if (current->children[keyword[i] - 'A'])
+            current = current->children[keyword[i] - 'A'];
         else {
             fprintf(fo, "EMPTY\n");
             free(keyword);
@@ -260,8 +274,8 @@ void topK(System system) {
 
     Tree current = root;
     while (i < l) {
-        if (current->children[keyword[i] - '0'])
-            current = current->children[keyword[i] - '0'];
+        if (current->children[keyword[i] - 'A'])
+            current = current->children[keyword[i] - 'A'];
         else {
             fprintf(fo, "EMPTY\n");
             free(keyword);
@@ -277,6 +291,7 @@ void topK(System system) {
         return;
     }
 
+    fprintf(fo, "%d ", listLength < k ? listLength: k);
     List it = current->first;
     Heap h = initHeap();
     while (it) {
@@ -288,7 +303,8 @@ void topK(System system) {
         File max = extractMax(h);
         fprintf(fo, "%s ", max->name);
     }
-    
+    fprintf(fo, "\n");
+
     freeHeap(h);
     free(keyword);
 }
@@ -312,5 +328,6 @@ void print(System system) {
         return;
     }
 
+    printRecursive(fo, root);
 
 }

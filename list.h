@@ -14,5 +14,6 @@ List insertSorted(List head, void *info);
 int existsFile(List head, char *name);
 List removeFile(List head, char *name);
 void freeFile(File file);
+void freeList(List head);
 
 #endif

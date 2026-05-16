@@ -53,6 +53,8 @@ int main()
             topK(system);
         else if (strcmp(command, "PRINT") == 0)
             print(system);
+        else if (strcmp(command, "PREFIX") == 0)
+            prefix(system);
         else
             fprintf(fo, "UNRECOGNIZED\n");
 

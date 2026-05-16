@@ -83,3 +83,11 @@ int existsFile(List head, char *name) {
 
     return 0;
 }
+
+void freeList(List head) {
+    while (head) {
+        List temp = head;
+        head = head->next;
+        free(temp);
+    }
+}

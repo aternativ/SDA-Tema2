@@ -60,6 +60,11 @@ void delete(System system) {
     // fgetc(fi);
 
     char *name = readWord(system);
+    if (!system->files) {
+        fprintf(fo, "NOT FOUND\n");
+        free(name);
+        return;
+    }
     // todo find file, delete its keywords
     List files = system->files;
     // edge case - is head
@@ -170,6 +175,7 @@ void delKW(System system) {
 
     if (!current) {
         fprintf(fo, "NOT FOUND\n");
+        ignoreInput(system);
         free(name);
         return;
     }
@@ -330,4 +336,49 @@ void print(System system) {
 
     printRecursive(fo, root);
 
+}
+
+// 4.1
+//
+
+void prefix(System system) {
+    FILE *fi = system->fi;
+    FILE *fo = system->fo;
+    Tree root = system->root;
+
+    char *prefix = readWord(system);
+    int i = 0;
+    int l = strlen(prefix);
+
+    Tree current = root;
+    while (i < l) {
+        if (current->children[prefix[i] - 'A'])
+            current = current->children[prefix[i] - 'A'];
+        else {
+            fprintf(fo, "EMPTY\n");
+            free(prefix);
+            return;
+        }
+        i++;
+    }
+
+    List prefixList = NULL;
+    listRecursive(current, &prefixList);
+
+    int listLength = length(prefixList);
+    if (!listLength) {
+        fprintf(fo, "EMPTY\n");
+        free(prefix);
+        return;
+    }
+
+    fprintf(fo, "%d ", listLength);
+    List temp = prefixList;
+    while (temp) {
+        fprintf(fo, "%s ", ((File)temp->info)->name);
+        temp = temp->next;
+    }
+    fprintf(fo, "\n");
+    free(prefix);
+    freeList(prefixList);
 }

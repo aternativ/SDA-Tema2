@@ -10,5 +10,6 @@ void delKW(System system);
 void find(System system);
 void topK(System system);
 void print(System system);
+void prefix(System system);
 
 #endif

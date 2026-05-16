@@ -26,12 +26,13 @@ Tree addMultitree(Tree root, char *s, File file) {
     }
 
     current->keyword = s;
-    current->first = insertSorted(current->first, file);
+    if (!existsFile(current->first, file->name))
+        current->first = insertSorted(current->first, file);
     return root;
 }
 
 Tree removeRecursive(Tree root, char *s, int index, int l) {
-    if (root->children[s[index] - 'A'] && index < l - 1)
+    if (root->children[s[index] - 'A'] && index < l)
             root->children[s[index] - 'A'] = removeRecursive(root->children[s[index] - 'A'], s, index + 1, l);
 
     int ok = 0;
@@ -78,4 +79,19 @@ void printRecursive(FILE *fo, Tree root) {
     for (int i = 0; i < 58; i++)
         if (root->children[i])
             printRecursive(fo, root->children[i]);
+}
+
+void listRecursive(Tree root, List *prefixFiles) {
+    if (root->first) {
+        List temp = root->first;
+        while (temp) {
+            if (!existsFile(*prefixFiles, ((File)temp->info)->name))
+                *prefixFiles = insertSorted(*prefixFiles, temp->info);
+            temp = temp->next;
+        }
+    }
+
+    for (int i = 0; i < 58; i++)
+        if (root->children[i])
+            listRecursive(root->children[i], prefixFiles);
 }

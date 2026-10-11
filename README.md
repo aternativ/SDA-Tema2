@@ -1,2 +1,2 @@
-# Emergency dispatch system - A Data Structures Exercise
-The purpose of this exercise is to implement a proof-of-concept emergency dispatch system, intertwining multiple data structures like dynamically allocated vectors, doubly linked lists (supporting multiple data types), queues, stacks and multitrees.
+# File lookup table - A Data Structures Exercise
+The purpose of this exercise is to implement a proof-of-concept emergency file lookup system. The files are kept in a linked list while their keywords are saved in a trie, alongside a list of references at every terminal node for the corresponding files. Supported operations are ADD, DEL, ADDKW, DELKW, FIND, TOPK (implemented with a heap) and PRINT.
